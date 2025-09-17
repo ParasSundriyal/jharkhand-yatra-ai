@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LeafletMap from "@/components/LeafletMap";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { 
   MapPin, 
   Navigation, 
@@ -24,6 +25,8 @@ const Maps = () => {
   const [selectedDestination, setSelectedDestination] = useState(null);
   const [mapView, setMapView] = useState("satellite");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
 
   const touristSpots = [
     {
@@ -73,6 +76,30 @@ const Maps = () => {
       difficulty: "Easy",
       timeRequired: "2-3 hours",
       bestTime: "Year round"
+    },
+    {
+      id: 5,
+      name: "Dassam Falls",
+      category: "Waterfall",
+      rating: 4.4,
+      coordinates: [23.4567, 85.6789],
+      description: "Beautiful waterfall near Ranchi with crystal clear water",
+      highlights: ["Photography", "Picnic Spot", "Nature Walk"],
+      difficulty: "Easy",
+      timeRequired: "2-3 hours",
+      bestTime: "July to November"
+    },
+    {
+      id: 6,
+      name: "Tagore Hill",
+      category: "Cultural",
+      rating: 4.3,
+      coordinates: [23.3567, 85.3234],
+      description: "Historic hill associated with Rabindranath Tagore",
+      highlights: ["Historical Significance", "Panoramic Views", "Peaceful Environment"],
+      difficulty: "Easy",
+      timeRequired: "1-2 hours",
+      bestTime: "Year round"
     }
   ];
 
@@ -114,9 +141,14 @@ const Maps = () => {
     { value: "Cultural", label: "Cultural Sites", icon: Building2 }
   ];
 
-  const filteredSpots = selectedCategory === "all" 
-    ? touristSpots 
-    : touristSpots.filter(spot => spot.category === selectedCategory);
+  const filteredSpots = touristSpots.filter(spot => {
+    const matchesCategory = selectedCategory === "all" || spot.category === selectedCategory;
+    const matchesSearch = searchQuery === "" || 
+      spot.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      spot.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      spot.highlights.some(highlight => highlight.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div className="min-h-screen py-8">
@@ -176,8 +208,26 @@ const Maps = () => {
                   <label className="text-sm font-medium">Search Location</label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search places..." className="pl-10" />
+                    <Input 
+                      placeholder="Search places..." 
+                      className="pl-10 pr-10" 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground hover:text-foreground"
+                      >
+                        ×
+                      </button>
+                    )}
                   </div>
+                  {searchQuery && (
+                    <p className="text-xs text-muted-foreground">
+                      Found {filteredSpots.length} result{filteredSpots.length !== 1 ? 's' : ''}
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -223,17 +273,38 @@ const Maps = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <LeafletMap 
-                  height="500px" 
-                  touristSpots={filteredSpots.map(spot => ({
-                    id: spot.id.toString(),
-                    name: spot.name,
-                    description: spot.description,
-                    latitude: spot.coordinates[0],
-                    longitude: spot.coordinates[1],
-                    category: spot.category
-                  }))}
-                />
+                {!isMapLoaded && (
+                  <div className="h-[500px] flex items-center justify-center bg-muted/20 rounded-lg">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                      <p className="text-sm text-muted-foreground">Loading interactive map...</p>
+                    </div>
+                  </div>
+                )}
+                <div className={isMapLoaded ? "block" : "hidden"}>
+                  <ErrorBoundary fallback={
+                    <div className="h-[500px] flex items-center justify-center bg-muted/20 rounded-lg">
+                      <div className="text-center">
+                        <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-muted-foreground mb-2">Map Loading Error</h3>
+                        <p className="text-sm text-muted-foreground">Unable to load the interactive map. Please refresh the page or try again later.</p>
+                      </div>
+                    </div>
+                  }>
+                    <LeafletMap 
+                      height="500px" 
+                      touristSpots={filteredSpots.map(spot => ({
+                        id: spot.id.toString(),
+                        name: spot.name,
+                        description: spot.description,
+                        latitude: spot.coordinates[0],
+                        longitude: spot.coordinates[1],
+                        category: spot.category
+                      }))}
+                      onMapReady={() => setIsMapLoaded(true)}
+                    />
+                  </ErrorBoundary>
+                </div>
               </CardContent>
             </Card>
 
@@ -246,8 +317,17 @@ const Maps = () => {
               </TabsList>
 
               <TabsContent value="places" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {filteredSpots.map((spot) => (
+                {filteredSpots.length === 0 ? (
+                  <div className="text-center py-12">
+                    <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-muted-foreground mb-2">No places found</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {searchQuery ? `No places match "${searchQuery}". Try adjusting your search or category filter.` : "No places match the selected category."}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {filteredSpots.map((spot) => (
                     <Card key={spot.id} className="hover:shadow-lg transition-shadow cursor-pointer">
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
@@ -292,8 +372,9 @@ const Maps = () => {
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </TabsContent>
 
               <TabsContent value="ar" className="space-y-4">

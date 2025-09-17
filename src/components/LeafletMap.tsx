@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -25,18 +25,27 @@ interface LeafletMapProps {
   center?: [number, number];
   zoom?: number;
   touristSpots?: TouristSpot[];
+  onMapReady?: () => void;
 }
 
-// Component to fit bounds to markers
-const FitBounds: React.FC<{ spots: TouristSpot[] }> = ({ spots }) => {
+// Component to handle map ready state and fit bounds
+const MapReadyHandler: React.FC<{ 
+  spots: TouristSpot[]; 
+  onMapReady?: () => void; 
+}> = ({ spots, onMapReady }) => {
   const map = useMap();
 
   useEffect(() => {
+    if (onMapReady) {
+      onMapReady();
+    }
+    
+    // Fit bounds to show all markers
     if (spots.length > 0) {
       const bounds = L.latLngBounds(spots.map(spot => [spot.latitude, spot.longitude]));
       map.fitBounds(bounds, { padding: [20, 20] });
     }
-  }, [map, spots]);
+  }, [map, spots, onMapReady]);
 
   return null;
 };
@@ -45,8 +54,12 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
   height = "400px",
   center = [23.6102, 85.2799], // Jharkhand coordinates
   zoom = 8,
-  touristSpots = []
+  touristSpots = [],
+  onMapReady
 }) => {
+  const [map, setMap] = useState<L.Map | null>(null);
+  const [mapError, setMapError] = useState<string | null>(null);
+
   // Default tourist spots for Jharkhand
   const defaultSpots: TouristSpot[] = [
     {
@@ -113,6 +126,24 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
     });
   };
 
+
+  if (mapError) {
+    return (
+      <div className="w-full rounded-lg overflow-hidden shadow-lg border border-border bg-muted/50 flex items-center justify-center" style={{ height }}>
+        <div className="text-center p-8">
+          <h3 className="text-lg font-semibold text-muted-foreground mb-2">Map Loading Error</h3>
+          <p className="text-sm text-muted-foreground">{mapError}</p>
+          <button 
+            onClick={() => setMapError(null)} 
+            className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full rounded-lg overflow-hidden shadow-lg border border-border">
       <MapContainer
@@ -125,6 +156,8 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        
+        <MapReadyHandler spots={spots} onMapReady={onMapReady} />
         
         {spots.map((spot) => (
           <Marker
@@ -146,8 +179,6 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
             </Popup>
           </Marker>
         ))}
-        
-        {spots.length > 1 && <FitBounds spots={spots} />}
       </MapContainer>
     </div>
   );
