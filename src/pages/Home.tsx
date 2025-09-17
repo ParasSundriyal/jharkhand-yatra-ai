@@ -4,10 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Search, MapPin, Calendar, Users, Star, Mountain, Trees, Camera, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import heroImage from "@/assets/jharkhand-hero.jpg";
 import tribalCrafts from "@/assets/tribal-crafts.jpg";
 
 const Home = () => {
+  const { user } = useAuth();
   const featuredDestinations = [
     {
       name: "Ranchi",

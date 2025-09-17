@@ -2,13 +2,15 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Mountain, Sun, Moon } from "lucide-react";
+import { Menu, Mountain, Sun, Moon, User, LogOut } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { theme, setTheme } = useTheme();
+  const { user, signOut } = useAuth();
 
   const navItems = [
     { href: "/", label: "Home" },
@@ -72,6 +74,28 @@ const Navigation = () => {
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             <span className="sr-only">Toggle theme</span>
           </Button>
+          
+          {/* Auth Actions */}
+          {user ? (
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" className="h-9 w-9 p-0" title="Profile">
+                <User className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-9 w-9 p-0"
+                onClick={signOut}
+                title="Sign Out"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <Button asChild variant="outline" size="sm">
+              <Link to="/auth">Sign In</Link>
+            </Button>
+          )}
         </div>
 
         {/* Mobile Navigation */}

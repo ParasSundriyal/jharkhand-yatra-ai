@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import LeafletMap from "@/components/LeafletMap";
 import { 
   MapPin, 
   Navigation, 
@@ -210,39 +211,29 @@ const Maps = () => {
 
           {/* Main Map & Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Interactive Map Placeholder */}
+            {/* Interactive Leaflet Map */}
             <Card>
-              <CardContent className="p-0">
-                <div className="h-96 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg relative overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <MapPin className="h-16 w-16 text-primary mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Interactive Map</h3>
-                      <p className="text-muted-foreground mb-4">
-                        Explore tourist spots, routes, and real-time information
-                      </p>
-                      <div className="space-y-2">
-                        <Badge className="mr-2">🗺️ {mapView} View</Badge>
-                        <Badge variant="outline">{filteredSpots.length} places shown</Badge>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Simulated Map Pins */}
-                  {filteredSpots.map((spot, index) => (
-                    <div
-                      key={spot.id}
-                      className={`absolute bg-primary text-primary-foreground rounded-full p-2 cursor-pointer hover:scale-110 transition-transform`}
-                      style={{
-                        left: `${20 + (index * 15)}%`,
-                        top: `${30 + (index * 10)}%`
-                      }}
-                      onClick={() => setSelectedDestination(spot)}
-                    >
-                      <MapPin className="h-4 w-4" />
-                    </div>
-                  ))}
-                </div>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-primary" />
+                  Interactive Tourism Map
+                </CardTitle>
+                <CardDescription>
+                  Explore {filteredSpots.length} tourist destinations across Jharkhand
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <LeafletMap 
+                  height="500px" 
+                  touristSpots={filteredSpots.map(spot => ({
+                    id: spot.id.toString(),
+                    name: spot.name,
+                    description: spot.description,
+                    latitude: spot.coordinates[0],
+                    longitude: spot.coordinates[1],
+                    category: spot.category
+                  }))}
+                />
               </CardContent>
             </Card>
 
