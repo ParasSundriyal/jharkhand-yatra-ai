@@ -15,6 +15,8 @@ import Marketplace from "./pages/Marketplace";
 import Feedback from "./pages/Feedback";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
+import Events from "./pages/Events";
+import Gallery from "./pages/Gallery";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +40,8 @@ const App = () => (
               <Route path="/marketplace" element={<Marketplace />} />
               <Route path="/feedback" element={<Feedback />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/gallery" element={<Gallery />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

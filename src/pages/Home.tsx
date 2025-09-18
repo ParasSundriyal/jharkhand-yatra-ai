@@ -5,6 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Search, MapPin, Calendar, Users, Star, Mountain, Trees, Camera, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import WeatherWidget from "@/components/WeatherWidget";
+import EventsCalendar from "@/components/EventsCalendar";
+import PhotoGallery from "@/components/PhotoGallery";
 import heroImage from "@/assets/jharkhand-hero.jpg";
 import tribalCrafts from "@/assets/tribal-crafts.jpg";
 
@@ -38,7 +41,7 @@ const Home = () => {
     { icon: Calendar, title: "Plan Itinerary", desc: "AI-powered trip planning", href: "/itinerary" },
     { icon: MapPin, title: "Explore Maps", desc: "Interactive tourist spots", href: "/maps" },
     { icon: Users, title: "AI Assistant", desc: "Multilingual chat support", href: "/chat" },
-    { icon: Globe, title: "Book Transport", desc: "Buses, trains & more", href: "/transport" },
+    { icon: Camera, title: "Photo Gallery", desc: "Stunning travel photos", href: "/gallery" },
   ];
 
   return (
@@ -203,6 +206,44 @@ const Home = () => {
                   </Link>
                 </CardContent>
               </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4 font-heading">Essential Tourism Features</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-body">
+              Everything you need for an amazing Jharkhand experience
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Weather Widget */}
+            <WeatherWidget />
+            
+            {/* Events Calendar */}
+            <EventsCalendar limit={3} showFilter={false} />
+            
+            {/* Photo Gallery */}
+            <PhotoGallery limit={3} showFilter={false} featuredOnly={true} />
+          </div>
+          
+          <div className="text-center mt-12">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/events">
+                <Button size="lg" variant="outline">
+                  View All Events
+                </Button>
+              </Link>
+              <Link to="/gallery">
+                <Button size="lg" variant="outline">
+                  Explore Gallery
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
