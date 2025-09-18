@@ -154,8 +154,8 @@ const Maps = () => {
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4">Interactive Maps & Virtual Experiences</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <h1 className="text-4xl font-bold mb-4 font-heading">Interactive Maps & Virtual Experiences</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-body">
             Explore Jharkhand through interactive maps, AR previews, and virtual reality experiences
           </p>
         </div>

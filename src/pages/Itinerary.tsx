@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar, MapPin, Users, DollarSign, Clock, Sparkles, Download } from "lucide-react";
+import { Calendar, MapPin, Users, DollarSign, Clock, Sparkles, Download, FileText } from "lucide-react";
+import jsPDF from 'jspdf';
 
 const Itinerary = () => {
   const [formData, setFormData] = useState({
@@ -92,12 +93,330 @@ const Itinerary = () => {
     }, 3000);
   };
 
+  const downloadItinerary = () => {
+    if (!generatedItinerary) return;
+
+    // Create HTML content for the PDF
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>${generatedItinerary.title}</title>
+          <style>
+            body {
+              font-family: 'Arial', sans-serif;
+              line-height: 1.6;
+              color: #333;
+              max-width: 800px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            .header {
+              text-align: center;
+              border-bottom: 3px solid #10b981;
+              padding-bottom: 20px;
+              margin-bottom: 30px;
+            }
+            .title {
+              font-size: 28px;
+              font-weight: bold;
+              color: #10b981;
+              margin-bottom: 10px;
+            }
+            .summary {
+              font-size: 16px;
+              color: #666;
+              font-style: italic;
+            }
+            .day-section {
+              margin-bottom: 30px;
+              border: 1px solid #e5e7eb;
+              border-radius: 8px;
+              overflow: hidden;
+            }
+            .day-header {
+              background-color: #10b981;
+              color: white;
+              padding: 15px;
+              font-size: 18px;
+              font-weight: bold;
+            }
+            .activity {
+              padding: 15px;
+              border-bottom: 1px solid #f3f4f6;
+            }
+            .activity:last-child {
+              border-bottom: none;
+            }
+            .time {
+              font-weight: bold;
+              color: #10b981;
+              display: inline-block;
+              width: 80px;
+            }
+            .activity-name {
+              font-weight: 500;
+              margin-bottom: 5px;
+            }
+            .location {
+              color: #666;
+              font-size: 14px;
+            }
+            .budget-section {
+              background-color: #f9fafb;
+              padding: 20px;
+              border-radius: 8px;
+              margin: 20px 0;
+            }
+            .budget-title {
+              font-size: 20px;
+              font-weight: bold;
+              color: #10b981;
+              margin-bottom: 15px;
+            }
+            .budget-item {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 8px;
+            }
+            .budget-total {
+              border-top: 2px solid #10b981;
+              padding-top: 10px;
+              font-weight: bold;
+              font-size: 16px;
+            }
+            .includes-section {
+              margin-top: 20px;
+            }
+            .includes-title {
+              font-size: 18px;
+              font-weight: bold;
+              color: #10b981;
+              margin-bottom: 10px;
+            }
+            .includes-list {
+              list-style: none;
+              padding: 0;
+            }
+            .includes-list li {
+              padding: 5px 0;
+              padding-left: 20px;
+              position: relative;
+            }
+            .includes-list li:before {
+              content: "✓";
+              color: #10b981;
+              font-weight: bold;
+              position: absolute;
+              left: 0;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 40px;
+              padding-top: 20px;
+              border-top: 1px solid #e5e7eb;
+              color: #666;
+              font-size: 14px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="title">${generatedItinerary.title}</div>
+            <div class="summary">${generatedItinerary.summary}</div>
+          </div>
+
+          ${generatedItinerary.days.map(day => `
+            <div class="day-section">
+              <div class="day-header">Day ${day.day}: ${day.title}</div>
+              ${day.activities.map(activity => `
+                <div class="activity">
+                  <div class="activity-name">
+                    <span class="time">${activity.time}</span>
+                    ${activity.activity}
+                  </div>
+                  <div class="location">📍 ${activity.location}</div>
+                </div>
+              `).join('')}
+            </div>
+          `).join('')}
+
+          <div class="budget-section">
+            <div class="budget-title">💰 Budget Breakdown</div>
+            ${Object.entries(generatedItinerary.budget).filter(([key]) => key !== 'total').map(([category, amount]) => `
+              <div class="budget-item">
+                <span>${category.charAt(0).toUpperCase() + category.slice(1)}</span>
+                <span>${amount}</span>
+              </div>
+            `).join('')}
+            <div class="budget-item budget-total">
+              <span>Total Estimated Cost</span>
+              <span>${generatedItinerary.budget.total}</span>
+            </div>
+          </div>
+
+          <div class="includes-section">
+            <div class="includes-title">✨ What's Included</div>
+            <ul class="includes-list">
+              ${generatedItinerary.includes.map(item => `<li>${item}</li>`).join('')}
+            </ul>
+          </div>
+
+          <div class="footer">
+            <p>Generated by Jharkhand Yatra AI • ${new Date().toLocaleDateString()}</p>
+            <p>For support, contact: support@jharkhandyatra.ai</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    // Create a blob with the HTML content
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+
+    // Create a temporary link element and trigger download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${generatedItinerary.title.replace(/\s+/g, '_')}_Itinerary.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
+  };
+
+  const downloadPDF = () => {
+    if (!generatedItinerary) return;
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
+
+    // Helper function to add text with word wrap
+    const addText = (text: string, x: number, y: number, maxWidth: number, fontSize: number = 12, isBold: boolean = false) => {
+      doc.setFontSize(fontSize);
+      if (isBold) {
+        doc.setFont(undefined, 'bold');
+      } else {
+        doc.setFont(undefined, 'normal');
+      }
+      
+      const lines = doc.splitTextToSize(text, maxWidth);
+      doc.text(lines, x, y);
+      return y + (lines.length * fontSize * 0.4);
+    };
+
+    // Helper function to check if we need a new page
+    const checkNewPage = (requiredSpace: number) => {
+      if (yPosition + requiredSpace > pageHeight - 20) {
+        doc.addPage();
+        yPosition = 20;
+        return true;
+      }
+      return false;
+    };
+
+    // Header
+    doc.setFillColor(16, 185, 129); // Primary green color
+    doc.rect(0, 0, pageWidth, 30, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    yPosition = addText(generatedItinerary.title, 20, 20, pageWidth - 40, 18, true);
+    
+    doc.setTextColor(0, 0, 0);
+    yPosition += 10;
+    yPosition = addText(generatedItinerary.summary, 20, yPosition, pageWidth - 40, 12);
+    yPosition += 15;
+
+    // Days
+    generatedItinerary.days.forEach((day, dayIndex) => {
+      checkNewPage(50);
+      
+      // Day header
+      doc.setFillColor(16, 185, 129);
+      doc.rect(20, yPosition - 5, pageWidth - 40, 15, 'F');
+      doc.setTextColor(255, 255, 255);
+      yPosition = addText(`Day ${day.day}: ${day.title}`, 25, yPosition, pageWidth - 50, 14, true);
+      
+      doc.setTextColor(0, 0, 0);
+      yPosition += 10;
+
+      // Activities
+      day.activities.forEach((activity) => {
+        checkNewPage(25);
+        
+        // Time
+        doc.setFillColor(240, 240, 240);
+        doc.rect(25, yPosition - 3, 30, 8, 'F');
+        yPosition = addText(activity.time, 27, yPosition, 26, 10, true);
+        
+        // Activity name
+        yPosition = addText(activity.activity, 60, yPosition, pageWidth - 70, 12, true);
+        
+        // Location
+        yPosition = addText(`📍 ${activity.location}`, 60, yPosition, pageWidth - 70, 10);
+        yPosition += 5;
+      });
+      
+      yPosition += 10;
+    });
+
+    // Budget section
+    checkNewPage(80);
+    yPosition = addText('💰 Budget Breakdown', 20, yPosition, pageWidth - 40, 16, true);
+    yPosition += 10;
+
+    Object.entries(generatedItinerary.budget).forEach(([category, amount]) => {
+      checkNewPage(15);
+      const categoryText = category === 'total' ? 'Total Estimated Cost' : category.charAt(0).toUpperCase() + category.slice(1);
+      const isTotal = category === 'total';
+      
+      if (isTotal) {
+        doc.setDrawColor(16, 185, 129);
+        doc.line(20, yPosition - 5, pageWidth - 20, yPosition - 5);
+        yPosition += 5;
+      }
+      
+      yPosition = addText(categoryText, 25, yPosition, pageWidth - 100, isTotal ? 14 : 12, isTotal);
+      yPosition = addText(amount as string, pageWidth - 60, yPosition, 40, isTotal ? 14 : 12, isTotal);
+      yPosition += 5;
+    });
+
+    // Includes section
+    checkNewPage(60);
+    yPosition += 10;
+    yPosition = addText('✨ What\'s Included', 20, yPosition, pageWidth - 40, 16, true);
+    yPosition += 10;
+
+    generatedItinerary.includes.forEach((item) => {
+      checkNewPage(15);
+      yPosition = addText(`✓ ${item}`, 25, yPosition, pageWidth - 50, 12);
+      yPosition += 5;
+    });
+
+    // Footer
+    checkNewPage(30);
+    yPosition += 20;
+    doc.setDrawColor(200, 200, 200);
+    doc.line(20, yPosition, pageWidth - 20, yPosition);
+    yPosition += 10;
+    
+    yPosition = addText(`Generated by Jharkhand Yatra AI • ${new Date().toLocaleDateString()}`, 20, yPosition, pageWidth - 40, 10);
+    yPosition = addText('For support, contact: support@jharkhandyatra.ai', 20, yPosition, pageWidth - 40, 10);
+
+    // Save the PDF
+    doc.save(`${generatedItinerary.title.replace(/\s+/g, '_')}_Itinerary.pdf`);
+  };
+
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">AI-Powered Itinerary Planner</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <h1 className="text-4xl font-bold mb-4 font-heading">AI-Powered Itinerary Planner</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-body">
             Let our intelligent system create a personalized travel experience based on your preferences
           </p>
         </div>
@@ -106,11 +425,11 @@ const Itinerary = () => {
           {/* Planning Form */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 font-heading">
                 <Sparkles className="h-5 w-5 text-primary" />
                 Plan Your Journey
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="font-body">
                 Fill in your preferences and let AI create the perfect itinerary
               </CardDescription>
             </CardHeader>
@@ -260,13 +579,19 @@ const Itinerary = () => {
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-2xl">{generatedItinerary.title}</CardTitle>
-                      <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4 mr-2" />
-                        Export PDF
-                      </Button>
+                      <CardTitle className="text-2xl font-heading">{generatedItinerary.title}</CardTitle>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={downloadPDF}>
+                          <FileText className="h-4 w-4 mr-2" />
+                          PDF
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={downloadItinerary}>
+                          <Download className="h-4 w-4 mr-2" />
+                          HTML
+                        </Button>
+                      </div>
                     </div>
-                    <CardDescription>{generatedItinerary.summary}</CardDescription>
+                    <CardDescription className="font-body">{generatedItinerary.summary}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">

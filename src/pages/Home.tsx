@@ -14,21 +14,21 @@ const Home = () => {
     {
       name: "Ranchi",
       description: "Capital city with rich tribal heritage",
-      image: "/api/placeholder/300/200",
+      image: "https://www.constructionworld.in/assets/uploads/9c40690b62907e1f9eb4057aafc277bc.jpg",
       rating: 4.5,
       activities: ["Cultural Tours", "Museums", "Shopping"]
     },
     {
       name: "Netarhat",
       description: "Queen of Chotanagpur plateau",
-      image: "/api/placeholder/300/200",
+      image: "https://s7ap1.scene7.com/is/image/incredibleindia/netarhat-dam-ranchi-jharkhand-2-attr-hero?qlt=82&ts=1727010840630",
       rating: 4.8,
       activities: ["Sunrise Views", "Trekking", "Photography"]
     },
     {
       name: "Betla National Park",
       description: "Wildlife sanctuary and tiger reserve",
-      image: "/api/placeholder/300/200",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQU6kUZ4fYJ4YH7MIggK6w-rA8hxEas_m2-kQ&s",
       rating: 4.6,
       activities: ["Wildlife Safari", "Bird Watching", "Nature Walks"]
     }
@@ -50,13 +50,13 @@ const Home = () => {
       >
         <div className="absolute inset-0 bg-black/40"></div>
         <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in font-heading">
             Discover the Heart of
             <span className="block bg-gradient-accent bg-clip-text text-transparent">
               Jharkhand
             </span>
           </h1>
-          <p className="text-xl md:text-2xl mb-8 opacity-90 animate-fade-in delay-200">
+          <p className="text-xl md:text-2xl mb-8 opacity-90 animate-fade-in delay-200 font-body">
             Experience tribal culture, pristine forests, and ancient heritage with AI-powered guidance
           </p>
           
@@ -95,8 +95,8 @@ const Home = () => {
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Featured Destinations</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold mb-4 font-heading">Featured Destinations</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-body">
               Discover the most enchanting places in Jharkhand, from ancient forests to vibrant tribal villages
             </p>
           </div>
@@ -118,8 +118,8 @@ const Home = () => {
                   </div>
                 </div>
                 <CardHeader>
-                  <CardTitle className="text-xl">{destination.name}</CardTitle>
-                  <CardDescription>{destination.description}</CardDescription>
+                  <CardTitle className="text-xl font-heading">{destination.name}</CardTitle>
+                  <CardDescription className="font-body">{destination.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">

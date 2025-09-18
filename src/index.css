@@ -8,6 +8,10 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    /* Font Families */
+    --font-heading: 'Montserrat', sans-serif;
+    --font-body: 'Lato', sans-serif;
+    
     /* Jharkhand Tourism Brand Colors */
     --background: 45 25% 97%;
     --foreground: 30 15% 15%;
@@ -136,6 +140,41 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  /* Heading styles */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+  }
+
+  /* Specific heading weights */
+  h1 {
+    font-weight: 700;
+  }
+
+  h2 {
+    font-weight: 600;
+  }
+
+  h3 {
+    font-weight: 600;
+  }
+
+  /* Subheading styles */
+  .subheading, .text-lg, .text-xl, .text-2xl, .text-3xl, .text-4xl, .text-5xl, .text-6xl, .text-7xl {
+    font-family: var(--font-body);
+  }
+
+  /* Card titles and descriptions */
+  .card-title, [data-card-title] {
+    font-family: var(--font-heading);
+    font-weight: 600;
+  }
+
+  .card-description, [data-card-description] {
+    font-family: var(--font-body);
   }
 }
 
