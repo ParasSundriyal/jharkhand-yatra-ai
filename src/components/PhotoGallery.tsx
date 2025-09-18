@@ -16,10 +16,7 @@ interface Photo {
   likes_count: number;
   is_featured: boolean;
   created_at: string;
-  profiles?: {
-    full_name: string | null;
-    username: string | null;
-  } | null;
+  user_id: string | null;
   [key: string]: any; // Allow additional properties from Supabase
 }
 
@@ -63,10 +60,7 @@ const PhotoGallery = ({
 
       let query = supabase
         .from('photos')
-        .select(`
-          *,
-          profiles(full_name, username)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (featuredOnly) {
@@ -220,15 +214,13 @@ const PhotoGallery = ({
                       </div>
                     </div>
                     
-                    {photo.profiles && (
-                      <div className="flex items-center gap-1 text-xs mt-2 text-white/60">
-                        <User className="h-3 w-3" />
-                        {photo.profiles?.full_name || photo.profiles?.username || 'Anonymous'}
-                        <span className="ml-2">
-                          {format(new Date(photo.created_at), 'MMM dd, yyyy')}
-                        </span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-1 text-xs mt-2 text-white/60">
+                      <User className="h-3 w-3" />
+                      {photo.user_id ? `User ${photo.user_id.slice(0, 8)}` : 'Anonymous'}
+                      <span className="ml-2">
+                        {format(new Date(photo.created_at), 'MMM dd, yyyy')}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
