@@ -14,6 +14,108 @@ export type Database = {
   }
   public: {
     Tables: {
+      events: {
+        Row: {
+          category: string
+          contact_info: string | null
+          created_at: string
+          description: string | null
+          event_date: string
+          event_time: string | null
+          id: string
+          image_url: string | null
+          latitude: number | null
+          location: string
+          longitude: number | null
+          organizer: string | null
+          price: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          contact_info?: string | null
+          created_at?: string
+          description?: string | null
+          event_date: string
+          event_time?: string | null
+          id?: string
+          image_url?: string | null
+          latitude?: number | null
+          location: string
+          longitude?: number | null
+          organizer?: string | null
+          price?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          contact_info?: string | null
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          event_time?: string | null
+          id?: string
+          image_url?: string | null
+          latitude?: number | null
+          location?: string
+          longitude?: number | null
+          organizer?: string | null
+          price?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      photos: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string
+          is_featured: boolean | null
+          latitude: number | null
+          likes_count: number | null
+          location: string
+          longitude: number | null
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url: string
+          is_featured?: boolean | null
+          latitude?: number | null
+          likes_count?: number | null
+          location: string
+          longitude?: number | null
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string
+          is_featured?: boolean | null
+          latitude?: number | null
+          likes_count?: number | null
+          location?: string
+          longitude?: number | null
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -41,6 +143,33 @@ export type Database = {
           preferences?: Json | null
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      weather_locations: {
+        Row: {
+          created_at: string
+          id: string
+          is_tourist_spot: boolean | null
+          latitude: number
+          longitude: number
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_tourist_spot?: boolean | null
+          latitude: number
+          longitude: number
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_tourist_spot?: boolean | null
+          latitude?: number
+          longitude?: number
+          name?: string
         }
         Relationships: []
       }
