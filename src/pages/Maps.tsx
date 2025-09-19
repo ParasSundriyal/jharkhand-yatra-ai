@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LeafletMap from "@/components/LeafletMap";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import VoiceGuide from "@/components/VoiceGuide";
+import ARViewer from "@/components/ARViewer";
 import { 
   MapPin, 
   Navigation, 
@@ -308,12 +310,12 @@ const Maps = () => {
               </CardContent>
             </Card>
 
-            {/* AR/VR Experiences */}
+            {/* Enhanced Experiences */}
             <Tabs defaultValue="places" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="places">Tourist Places</TabsTrigger>
-                <TabsTrigger value="ar">AR Preview</TabsTrigger>
-                <TabsTrigger value="vr">VR Experiences</TabsTrigger>
+                <TabsTrigger value="voice">Voice Guide</TabsTrigger>
+                <TabsTrigger value="ar">AR Experience</TabsTrigger>
               </TabsList>
 
               <TabsContent value="places" className="space-y-4">
@@ -377,65 +379,20 @@ const Maps = () => {
                 )}
               </TabsContent>
 
-              <TabsContent value="ar" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {filteredSpots.map((spot) => (
-                    <Card key={spot.id}>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Eye className="h-5 w-5" />
-                          AR Preview: {spot.name}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="h-40 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center mb-4">
-                          <div className="text-center">
-                            <Camera className="h-12 w-12 text-primary mx-auto mb-2" />
-                            <p className="text-sm font-medium">AR Experience</p>
-                            <p className="text-xs text-muted-foreground">Interactive 360° view</p>
-                          </div>
-                        </div>
-                        <Button className="w-full">
-                          <Play className="h-4 w-4 mr-2" />
-                          Launch AR Preview
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+              <TabsContent value="voice" className="space-y-4">
+                <VoiceGuide 
+                  touristSpots={filteredSpots} 
+                  selectedSpot={selectedDestination}
+                  onSpotSelect={setSelectedDestination}
+                />
               </TabsContent>
 
-              <TabsContent value="vr" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[
-                    { name: "Virtual Tribal Village Tour", duration: "15 min", type: "Cultural" },
-                    { name: "Netarhat Sunrise Experience", duration: "8 min", type: "Nature" },
-                    { name: "Wildlife Safari VR", duration: "20 min", type: "Adventure" },
-                    { name: "Waterfall Trek Simulation", duration: "12 min", type: "Adventure" }
-                  ].map((experience, index) => (
-                    <Card key={index}>
-                      <CardHeader>
-                        <CardTitle className="text-lg">{experience.name}</CardTitle>
-                        <div className="flex gap-2">
-                          <Badge variant="secondary">{experience.type}</Badge>
-                          <Badge variant="outline">{experience.duration}</Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="h-32 bg-gradient-to-br from-blue-100 to-green-100 rounded-lg flex items-center justify-center mb-4">
-                          <div className="text-center">
-                            <Eye className="h-10 w-10 text-primary mx-auto mb-2" />
-                            <p className="text-sm font-medium">VR Experience</p>
-                          </div>
-                        </div>
-                        <Button className="w-full bg-gradient-hero hover:opacity-90">
-                          <Play className="h-4 w-4 mr-2" />
-                          Start VR Experience
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+              <TabsContent value="ar" className="space-y-4">
+                <ARViewer 
+                  touristSpots={filteredSpots}
+                  selectedSpot={selectedDestination}
+                  onSpotSelect={setSelectedDestination}
+                />
               </TabsContent>
             </Tabs>
           </div>
