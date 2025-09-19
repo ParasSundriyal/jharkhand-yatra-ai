@@ -82,7 +82,22 @@ const ARViewer: React.FC<ARViewerProps> = ({
   }, []);
 
   const startAR = async () => {
+    if (!selectedSpot) {
+      toast({
+        title: "Select a Destination",
+        description: "Please select a tourist spot first to experience AR",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
+      // Check if navigator.mediaDevices is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera API not supported');
+      }
+
+      console.log('Requesting camera permission...');
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
           facingMode: 'environment',
@@ -91,9 +106,12 @@ const ARViewer: React.FC<ARViewerProps> = ({
         } 
       });
       
+      console.log('Camera stream obtained:', stream);
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        await videoRef.current.play();
+        console.log('Video playback started');
       }
       
       setCameraPermission('granted');
@@ -107,9 +125,21 @@ const ARViewer: React.FC<ARViewerProps> = ({
     } catch (error) {
       console.error('Camera access error:', error);
       setCameraPermission('denied');
+      
+      let errorMessage = "Enable camera permissions to use AR features";
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError') {
+          errorMessage = "Camera permission denied. Please allow camera access and try again.";
+        } else if (error.name === 'NotFoundError') {
+          errorMessage = "No camera found. Please ensure your device has a camera.";
+        } else if (error.name === 'NotSupportedError') {
+          errorMessage = "Camera not supported on this browser/device.";
+        }
+      }
+      
       toast({
-        title: "Camera Access Denied",
-        description: "Enable camera permissions to use AR features",
+        title: "AR Mode Failed",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -166,8 +196,11 @@ const ARViewer: React.FC<ARViewerProps> = ({
             }}
           >
             <div className="relative group">
-              <div className="w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg animate-pulse cursor-pointer" />
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button 
+                className="w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg animate-pulse cursor-pointer hover:scale-110 transition-transform"
+                onClick={() => playAudioGuide(`This is ${hotspot.info} at ${currentSpot.name}`)}
+              />
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                 <div className="bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
                   {hotspot.info}
                 </div>
@@ -327,6 +360,7 @@ const ARViewer: React.FC<ARViewerProps> = ({
             variant={arMode === 'live' ? 'default' : 'outline'}
             size="sm"
             onClick={isARActive ? stopAR : startAR}
+            disabled={!selectedSpot}
           >
             <Camera className="h-4 w-4 mr-2" />
             {isARActive ? 'Stop AR' : 'Live AR'}

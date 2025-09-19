@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 
 const Maps = () => {
-  const [selectedDestination, setSelectedDestination] = useState(null);
+  const [selectedDestination, setSelectedDestination] = useState<typeof touristSpots[0] | null>(null);
   const [mapView, setMapView] = useState("satellite");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
