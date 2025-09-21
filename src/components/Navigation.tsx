@@ -79,8 +79,8 @@ const Navigation = () => {
           {/* Auth Actions */}
           {user ? (
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" className="h-9 w-9 p-0" title="Profile">
-                <User className="h-4 w-4" />
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/dashboard">Dashboard</Link>
               </Button>
               <Button 
                 variant="ghost" 

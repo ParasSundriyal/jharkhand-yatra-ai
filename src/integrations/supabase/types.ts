@@ -146,6 +146,204 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_items: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_available: boolean | null
+          item_images: string[] | null
+          item_name: string
+          latitude: number | null
+          longitude: number | null
+          price: number
+          rating: number | null
+          shop_address: string
+          shop_name: string
+          shop_owner_id: string
+          shop_phone: string
+          total_orders: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_available?: boolean | null
+          item_images?: string[] | null
+          item_name: string
+          latitude?: number | null
+          longitude?: number | null
+          price: number
+          rating?: number | null
+          shop_address: string
+          shop_name: string
+          shop_owner_id: string
+          shop_phone: string
+          total_orders?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_available?: boolean | null
+          item_images?: string[] | null
+          item_name?: string
+          latitude?: number | null
+          longitude?: number | null
+          price?: number
+          rating?: number | null
+          shop_address?: string
+          shop_name?: string
+          shop_owner_id?: string
+          shop_phone?: string
+          total_orders?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      tour_packages: {
+        Row: {
+          contact_phone: string
+          created_at: string | null
+          description: string | null
+          duration_hours: number
+          guide_id: string
+          id: string
+          included_features: string[] | null
+          is_active: boolean | null
+          max_people: number | null
+          meeting_point: string
+          package_images: string[] | null
+          package_name: string
+          price_per_person: number
+          rating: number | null
+          total_bookings: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          contact_phone: string
+          created_at?: string | null
+          description?: string | null
+          duration_hours: number
+          guide_id: string
+          id?: string
+          included_features?: string[] | null
+          is_active?: boolean | null
+          max_people?: number | null
+          meeting_point: string
+          package_images?: string[] | null
+          package_name: string
+          price_per_person: number
+          rating?: number | null
+          total_bookings?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          contact_phone?: string
+          created_at?: string | null
+          description?: string | null
+          duration_hours?: number
+          guide_id?: string
+          id?: string
+          included_features?: string[] | null
+          is_active?: boolean | null
+          max_people?: number | null
+          meeting_point?: string
+          package_images?: string[] | null
+          package_name?: string
+          price_per_person?: number
+          rating?: number | null
+          total_bookings?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      transport_services: {
+        Row: {
+          available_locations: string[] | null
+          contact_email: string | null
+          contact_phone: string
+          created_at: string | null
+          description: string | null
+          fixed_price: number | null
+          id: string
+          is_active: boolean | null
+          price_per_km: number | null
+          provider_id: string
+          rating: number | null
+          service_name: string
+          total_rides: number | null
+          updated_at: string | null
+          vehicle_images: string[] | null
+          vehicle_type: string
+        }
+        Insert: {
+          available_locations?: string[] | null
+          contact_email?: string | null
+          contact_phone: string
+          created_at?: string | null
+          description?: string | null
+          fixed_price?: number | null
+          id?: string
+          is_active?: boolean | null
+          price_per_km?: number | null
+          provider_id: string
+          rating?: number | null
+          service_name: string
+          total_rides?: number | null
+          updated_at?: string | null
+          vehicle_images?: string[] | null
+          vehicle_type: string
+        }
+        Update: {
+          available_locations?: string[] | null
+          contact_email?: string | null
+          contact_phone?: string
+          created_at?: string | null
+          description?: string | null
+          fixed_price?: number | null
+          id?: string
+          is_active?: boolean | null
+          price_per_km?: number | null
+          provider_id?: string
+          rating?: number | null
+          service_name?: string
+          total_rides?: number | null
+          updated_at?: string | null
+          vehicle_images?: string[] | null
+          vehicle_type?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_verified: boolean | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_verified?: boolean | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_verified?: boolean | null
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       weather_locations: {
         Row: {
           created_at: string
@@ -178,10 +376,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_roles: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"][]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "tourist"
+        | "transport_provider"
+        | "shop_owner"
+        | "hotel_owner"
+        | "tour_guide"
+        | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -308,6 +522,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "tourist",
+        "transport_provider",
+        "shop_owner",
+        "hotel_owner",
+        "tour_guide",
+        "admin",
+      ],
+    },
   },
 } as const
